@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -17,12 +18,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { PASSPORT_STRATEGY_NAME } from 'src/util/constants';
 import { CampaignService } from './campaign.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 
 @ApiTags('Campaigns')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard(PASSPORT_STRATEGY_NAME))
 @Controller('campaigns')
 export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
@@ -32,10 +34,16 @@ export class CampaignController {
   @ApiResponse({ status: 201, description: 'Campaign created successfully' })
   async create(@Body() createCampaignDto: CreateCampaignDto, @Request() req) {
     try {
-      return await this.campaignService.create(
+      const campaign = await this.campaignService.create(
         createCampaignDto,
         req?.user?.userId,
       );
+
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: 'Campaign created successfully',
+        data: campaign,
+      };
     } catch (error) {
       throw error;
     }
@@ -46,7 +54,13 @@ export class CampaignController {
   @ApiResponse({ status: 200, description: 'Return all campaigns' })
   async findAll(@Query() query: any) {
     try {
-      return await this.campaignService.findAll(query);
+      const campaigns = await this.campaignService.findAll(query);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Campaigns fetched successfully',
+        data: campaigns,
+      };
     } catch (error) {
       throw error;
     }
@@ -57,7 +71,13 @@ export class CampaignController {
   @ApiResponse({ status: 200, description: 'Get a campaign details by id' })
   async findOne(@Param('id') id: string) {
     try {
-      return await this.campaignService.findOne(id);
+      const campaign = await this.campaignService.findOne(id);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Campaign fetched successfully',
+        data: campaign,
+      };
     } catch (error) {
       throw error;
     }
@@ -71,7 +91,13 @@ export class CampaignController {
     @Body() updateCampaignDto: Partial<CreateCampaignDto>,
   ) {
     try {
-      return await this.campaignService.update(id, updateCampaignDto);
+      const campaign = await this.campaignService.update(id, updateCampaignDto);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Campaign updated successfully',
+        data: campaign,
+      };
     } catch (error) {
       throw error;
     }
@@ -82,7 +108,13 @@ export class CampaignController {
   @ApiResponse({ status: 200, description: 'Campaign deleted successfully' })
   async remove(@Param('id') id: string) {
     try {
-      return await this.campaignService.delete(id);
+      const campaign = await this.campaignService.delete(id);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Campaign deleted successfully',
+        data: campaign,
+      };
     } catch (error) {
       throw error;
     }
