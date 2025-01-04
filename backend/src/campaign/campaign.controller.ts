@@ -21,6 +21,7 @@ import {
 import { PASSPORT_STRATEGY_NAME } from 'src/util/constants';
 import { CampaignService } from './campaign.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
+import { QueryCampaignDto } from './dto/query-campaign.dto';
 
 @ApiTags('Campaigns')
 @ApiBearerAuth()
@@ -52,14 +53,15 @@ export class CampaignController {
   @Get()
   @ApiOperation({ summary: 'Get all campaigns' })
   @ApiResponse({ status: 200, description: 'Return all campaigns' })
-  async findAll(@Query() query: any) {
+  async findAll(@Query() query: QueryCampaignDto) {
     try {
-      const campaigns = await this.campaignService.findAll(query);
+      const data = await this.campaignService.findAll(query);
 
       return {
         statusCode: HttpStatus.OK,
         message: 'Campaigns fetched successfully',
-        data: campaigns,
+        data: data?.campaigns,
+        metadata: data?.metadata,
       };
     } catch (error) {
       throw error;
@@ -97,6 +99,23 @@ export class CampaignController {
         statusCode: HttpStatus.OK,
         message: 'Campaign updated successfully',
         data: campaign,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post(':id/send')
+  @ApiOperation({ summary: 'Send / Run campaign emails' })
+  @ApiResponse({ status: 200, description: 'Emails queued successfully' })
+  @ApiResponse({ status: 404, description: 'Campaign not found' })
+  async sendCampaignEmails(@Param('id') id: string) {
+    try {
+      await this.campaignService.sendCampaignEmails(id);
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Emails queued successfully',
       };
     } catch (error) {
       throw error;

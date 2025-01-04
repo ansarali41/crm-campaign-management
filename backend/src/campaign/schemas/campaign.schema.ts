@@ -10,6 +10,9 @@ export class Campaign {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true })
+  subject: string;
+
   @Prop({ required: true, enum: CampaignType })
   type: CampaignType;
 

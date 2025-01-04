@@ -1,3 +1,5 @@
 export const CAMPAIGN_SERVICE_NAME = 'CAMPAIGN_SERVICE';
 
 export const PASSPORT_STRATEGY_NAME = 'jwt';
+
+export const EMAIL_SERVICE_NAME = 'EMAIL_SERVICE';

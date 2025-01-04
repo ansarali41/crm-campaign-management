@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 interface CampaignForm {
     name: string;
     type: 'email' | 'sms';
+    subject: string;
     content: string;
     recipients: string;
     scheduledAt?: Date | string;
@@ -86,6 +87,13 @@ export default function CampaignFormPage() {
                                     placeholder="Enter campaign name"
                                     {...register('name', { required: 'Name is required' })}
                                     error={errors.name?.message}
+                                />
+
+                                <InputField
+                                    label="Subject"
+                                    placeholder="Enter subject"
+                                    {...register('subject', { required: 'Subject is required' })}
+                                    error={errors.subject?.message}
                                 />
 
                                 <InputField
