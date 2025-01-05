@@ -3,9 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -27,16 +27,31 @@ export class AuthService {
     }
   }
 
+  async findOneUser(options: any) {
+    try {
+      const user = await this.userModel
+        .findOne(options)
+        .select('-password -__v');
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async validateUser(loginDto: LoginDto): Promise<any> {
     try {
       const user = await this.userModel.findOne({ email: loginDto.email });
       if (!user) {
         throw new NotFoundException('User not found');
       }
-
-      await this.isValidPassword(loginDto.password, user.password);
-
       const { password, ...result } = user.toObject();
+
+      await this.isValidPassword(loginDto.password, password);
+
       return result;
     } catch (error) {
       throw error;
@@ -45,11 +60,9 @@ export class AuthService {
 
   async login(user: UserDocument) {
     try {
-      const payload = { email: user.email, id: user._id, role: user.role };
+      const payload = { email: user.email, sub: user._id, role: user.role };
 
-      return {
-        access_token: this.jwtService.sign(payload),
-      };
+      return this.jwtService.sign(payload);
     } catch (error) {
       throw error;
     }

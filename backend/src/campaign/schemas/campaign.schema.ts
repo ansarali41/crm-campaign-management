@@ -10,6 +10,9 @@ export class Campaign {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true })
+  subject: string;
+
   @Prop({ required: true, enum: CampaignType })
   type: CampaignType;
 
@@ -36,6 +39,12 @@ export class Campaign {
 
   @Prop({ default: 0 })
   openCount: number;
+
+  @Prop({ default: 0 })
+  deliveredCount: number;
+
+  @Prop({ default: 0 })
+  totalUsed: number;
 
   @Prop({ type: Map, of: String })
   metadata: Record<string, any>;

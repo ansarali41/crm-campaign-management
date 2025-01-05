@@ -13,6 +13,10 @@ export class CreateCampaignDto {
   @IsString()
   name: string;
 
+  @ApiProperty()
+  @IsString()
+  subject: string;
+
   @ApiProperty({ enum: CampaignType })
   @IsEnum(CampaignType)
   type: CampaignType;

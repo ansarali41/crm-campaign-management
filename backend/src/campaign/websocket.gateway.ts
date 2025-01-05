@@ -2,7 +2,6 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   WebSocketGateway as WSGateway,
-  WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Campaign } from './schemas/campaign.schema';
@@ -15,7 +14,6 @@ import { Campaign } from './schemas/campaign.schema';
 export class WebSocketGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer()
   server: Server;
 
   handleConnection(client: Socket) {

@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -31,11 +32,25 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   // Start the server
-  const port = configService.get<number>('port') || 3000;
+  const port = configService.get<number>('PORT') || 3000;
   await app.listen(port, () => {
     console.log(
       `Application is running on port: ${port}, Swagger documentation is available at: http://localhost:${port}/api`,
     );
   });
+
+  // RabbitMQ microservice
+  const emailMicroservice =
+    await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+      transport: Transport.RMQ,
+      options: {
+        urls: [configService.get<string>('rabbitmq.url')],
+        queue: configService.get<string>('rabbitmq.email_queue'),
+      },
+    });
+
+  await emailMicroservice.listen();
+  console.log('Email Microservice is listening...');
 }
+
 bootstrap();
