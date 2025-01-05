@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/auth.store';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const router = useRouter();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const { user, logout, initAuth } = useAuthStore();
 
@@ -15,6 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const handleLogout = () => {
         logout();
         setIsDropdownOpen(false);
+        router.push('/auth/login');
     };
 
     return (

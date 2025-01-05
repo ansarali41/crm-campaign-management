@@ -3,6 +3,8 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/Button';
+import Link from 'next/link';
+import { useState } from 'react';
 
 interface LoginForm {
     email: string;
@@ -12,6 +14,7 @@ interface LoginForm {
 export default function LoginPage() {
     const router = useRouter();
     const login = useAuthStore(state => state.login);
+    const [error, setError] = useState('');
     const {
         register,
         handleSubmit,
@@ -20,10 +23,12 @@ export default function LoginPage() {
 
     const onSubmit = async (data: LoginForm) => {
         try {
+            setError('');
             await login(data.email, data.password);
             router.push('/dashboard');
         } catch (error) {
             console.error('Login failed:', error);
+            setError('Login failed. Please check your credentials.');
         }
     };
 
@@ -32,7 +37,18 @@ export default function LoginPage() {
             <div className="max-w-md w-full space-y-8">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+                    <p className="mt-2 text-center text-sm text-gray-600">
+                        Or{' '}
+                        <Link href="/auth/register" className="font-medium text-blue-600 hover:text-blue-500">
+                            create a new account
+                        </Link>
+                    </p>
                 </div>
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative" role="alert">
+                        <span className="block sm:inline">{error}</span>
+                    </div>
+                )}
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
