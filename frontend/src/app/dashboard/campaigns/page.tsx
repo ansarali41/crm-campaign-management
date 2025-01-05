@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/card';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { apiClient } from '@/lib/axios';
+import { useAuthStore } from '@/store/auth.store';
 import { useCampaignStore } from '@/store/campaign.store';
 import clsx from 'clsx';
 import { format } from 'date-fns';
@@ -13,6 +14,8 @@ import toast from 'react-hot-toast';
 export default function CampaignsPage() {
     const router = useRouter();
     const { campaigns, loading, metadata, fetchCampaigns, deleteCampaign, error, analytics, getCampaignAnalytics } = useCampaignStore();
+    const { user } = useAuthStore();
+
     const [mounted, setMounted] = useState(false);
     const [actionCampaign, setActionCampaign] = useState<string | null>(null);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -22,9 +25,12 @@ export default function CampaignsPage() {
 
     useEffect(() => {
         setMounted(true);
-        getCampaignAnalytics();
-        fetchCampaigns(1, 10); // Start with first page
-    }, [fetchCampaigns, getCampaignAnalytics]);
+        if (user?._id) {
+            // Only fetch if we have a user
+            getCampaignAnalytics();
+            fetchCampaigns(1, 10, user._id);
+        }
+    }, [fetchCampaigns, getCampaignAnalytics, user?._id]);
 
     // Prevent hydration mismatch by not rendering until client-side
     if (!mounted) {

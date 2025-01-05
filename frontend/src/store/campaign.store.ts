@@ -44,7 +44,7 @@ interface CampaignState {
     loading: boolean;
     error: string | null;
     analytics: CampaignAnalytics | null;
-    fetchCampaigns: (page?: number, limit?: number) => Promise<void>;
+    fetchCampaigns: (page?: number, limit?: number, createdBy?: string) => Promise<void>;
     fetchCampaign: (id: string) => Promise<void>;
     createCampaign: (campaign: Partial<Campaign>) => Promise<void>;
     updateCampaign: (id: string, campaign: Partial<Campaign>) => Promise<void>;
@@ -67,11 +67,11 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
     error: null,
     analytics: null,
 
-    fetchCampaigns: async (page = 1, limit = 10) => {
+    fetchCampaigns: async (page = 1, limit = 10, createdBy?: string) => {
         try {
             set({ loading: true });
             const response = await apiClient.get('/campaigns', {
-                params: { page, limit },
+                params: { page, limit, ...(createdBy && { createdBy }) },
             });
 
             // Ensure we have valid numbers for metadata
