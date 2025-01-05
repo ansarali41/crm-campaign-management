@@ -1,36 +1,155 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CRM Campaign Management System
+
+A modern, full-stack application for managing email campaigns with real-time status updates.
+
+## Features
+
+-   User Authentication & Authorization
+-   Campaign Management (Create, Read, Update, Delete)
+-   Email Campaign Execution
+-   Real-time Campaign Status Updates
+-   Campaign Analytics Dashboard
+-   Responsive UI with Modern Design
+
+## Tech Stack
+
+### Frontend
+
+-   Next.js 13+ (React Framework)
+-   TypeScript
+-   Tailwind CSS
+-   Zustand (State Management)
+-   Axios (HTTP Client)
+-   React Hot Toast (Notifications)
+-   Socket.io Client (Real-time Updates)
+
+### Backend
+
+-   NestJS (Node.js Framework)
+-   TypeScript
+-   MongoDB with Mongoose
+-   JWT Authentication
+-   RabbitMQ (Message Queue)
+-   Nodemailer (Email Service)
+-   Socket.io (WebSocket)
+
+## Prerequisites
+
+-   Node.js 22+
+-   MongoDB
+-   RabbitMQ Server
+-   SMTP Server Configuration
+
+## Environment Variables
+
+### Frontend (.env.local)
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_TINYMCE_API_KEY = your-tinymce-api-key
+```
+
+### Backend (.env)
+
+```
+# App
+PORT=4000
+FRONTEND_URL=http://localhost:3000
+
+# MongoDB
+MONGODB_URI=mongodb://localhost:27017/crm-campaign
+
+# JWT
+JWT_SECRET=your-jwt-secret
+JWT_EXPIRES_IN=7d
+
+# Email
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_USERNAME=your-email@example.com
+EMAIL_PASSWORD=your-email-password
+
+# RabbitMQ
+RABBITMQ_URL=amqp://localhost:5672
+RABBITMQ_EMAIL_QUEUE=email_queue
+```
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/crm-campaign-management.git
+cd crm-campaign-management
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Frontend
+cd frontend
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Backend
+cd ../backend
+npm install
+```
 
-## Learn More
+3. Set up environment variables
 
-To learn more about Next.js, take a look at the following resources:
+-   Create `.env.local` in the frontend directory
+-   Create `.env` in the backend directory
+-   Add the required environment variables as shown above
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Start the development servers
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Backend
+cd backend
+npm run start:dev
 
-## Deploy on Vercel
+# Frontend
+cd frontend
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Access the application
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+-   Frontend: http://localhost:3000
+-   Backend API: http://localhost:4000
+
+## Project Structure
+
+### Frontend
+
+```
+src/
+├── app/              # Next.js 13+ app directory
+├── components/       # Reusable UI components
+├── lib/             # Utility functions and configurations
+├── store/           # Zustand store configurations
+└── types/           # TypeScript type definitions
+```
+
+### Backend
+
+```
+src/
+├── auth/            # Authentication module
+├── campaign/        # Campaign management module
+├── email-consumer/  # Email processing module
+├── util/           # Utility functions and constants
+└── main.ts         # Application entry point
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
