@@ -138,4 +138,26 @@ export class CampaignController {
       throw error;
     }
   }
+
+  @Get('analytics/overview')
+  @ApiOperation({ summary: 'Get overview analytics for all campaigns' })
+  @ApiResponse({
+    status: 200,
+    description: 'Overview analytics retrieved successfully',
+  })
+  async getAnalyticsOverview(@Request() req): Promise<any> {
+    try {
+      const analytics = await this.campaignService.getAnalyticsOverview(
+        req?.user?.userId,
+      );
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Analytics overview retrieved successfully',
+        data: analytics,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

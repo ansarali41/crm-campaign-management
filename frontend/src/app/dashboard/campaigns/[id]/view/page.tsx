@@ -104,13 +104,15 @@ export default function CampaignViewPage() {
                                         <p className="text-sm font-medium text-gray-500">Sent</p>
                                         <p className="mt-1 text-sm text-gray-900">{selectedCampaign.sentCount}</p>
                                     </div>
+
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-500">Delivered</p>
+                                        <p className="mt-1 text-sm text-gray-900">{selectedCampaign.deliveredCount}</p>
+                                    </div>
+
                                     <div>
                                         <p className="text-sm font-medium text-gray-500">Failed</p>
                                         <p className="mt-1 text-sm text-gray-900">{selectedCampaign.failedCount}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Opened</p>
-                                        <p className="mt-1 text-sm text-gray-900">{selectedCampaign.openCount}</p>
                                     </div>
                                 </div>
                             </dd>

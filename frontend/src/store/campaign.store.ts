@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import { apiClient } from '@/lib/axios';
+import { create } from 'zustand';
 
 export interface Campaign {
     _id: string;
@@ -20,6 +20,7 @@ export interface Campaign {
     sentCount: number;
     failedCount: number;
     openCount: number;
+    deliveredCount: number;
 }
 
 interface PaginationMetadata {
@@ -29,16 +30,26 @@ interface PaginationMetadata {
     totalPages: number;
 }
 
+export interface CampaignAnalytics {
+    total_campaigns: number;
+    total_emails_sent: number;
+    total_sms_sent: number;
+    total_delivered: number;
+}
+
 interface CampaignState {
     campaigns: Campaign[];
     selectedCampaign: Campaign | null;
     metadata: PaginationMetadata;
     loading: boolean;
+    error: string | null;
+    analytics: CampaignAnalytics | null;
     fetchCampaigns: (page?: number, limit?: number) => Promise<void>;
     fetchCampaign: (id: string) => Promise<void>;
     createCampaign: (campaign: Partial<Campaign>) => Promise<void>;
     updateCampaign: (id: string, campaign: Partial<Campaign>) => Promise<void>;
     deleteCampaign: (id: string) => Promise<void>;
+    getCampaignAnalytics: () => Promise<void>;
 }
 
 const defaultMetadata: PaginationMetadata = {
@@ -53,6 +64,8 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
     selectedCampaign: null,
     metadata: defaultMetadata,
     loading: false,
+    error: null,
+    analytics: null,
 
     fetchCampaigns: async (page = 1, limit = 10) => {
         try {
@@ -73,9 +86,10 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
                 campaigns: response.data.data || [],
                 metadata,
                 loading: false,
+                error: null,
             });
         } catch (error) {
-            set({ loading: false, campaigns: [], metadata: defaultMetadata });
+            set({ loading: false, campaigns: [], metadata: defaultMetadata, error: error instanceof Error ? error.message : 'Failed to fetch campaigns' });
             throw error;
         }
     },
@@ -84,9 +98,9 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
         try {
             set({ loading: true });
             const response = await apiClient.get(`/campaigns/${id}`);
-            set({ selectedCampaign: response.data.data, loading: false });
+            set({ selectedCampaign: response.data.data, loading: false, error: null });
         } catch (error) {
-            set({ loading: false, selectedCampaign: null });
+            set({ loading: false, selectedCampaign: null, error: error instanceof Error ? error.message : 'Failed to fetch campaign' });
             throw error;
         }
     },
@@ -136,6 +150,30 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
         } catch (error) {
             set({ loading: false });
             throw error;
+        }
+    },
+
+    getCampaignAnalytics: async () => {
+        try {
+            set({ loading: true, error: null });
+            const endpoint = '/campaigns/analytics/overview';
+            const response = await apiClient.get<{ data: CampaignAnalytics }>(endpoint);
+
+            // Transform the data if it's the overview endpoint
+            const analyticsData = response.data.data;
+
+            set({
+                loading: false,
+                analytics: analyticsData,
+                error: null,
+            });
+        } catch (error) {
+            set({
+                loading: false,
+                analytics: null,
+                error: error instanceof Error ? error.message : 'Failed to fetch campaign analytics',
+            });
+            console.error('Error fetching campaign analytics:', error);
         }
     },
 }));

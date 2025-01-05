@@ -2,11 +2,12 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EmailConsumerService } from 'src/email-consumer/email-consumer.service';
-import { CampaignStatus } from 'src/util/enums';
+import { CampaignStatus, CampaignType } from 'src/util/enums';
+import { AnalyticsOverview } from 'src/util/interfaces';
+import { CampaignStatusService } from './campaign-status.service';
 import { QueryCampaignDto } from './dto/query-campaign.dto';
 import { Campaign, CampaignDocument } from './schemas/campaign.schema';
 import { WebSocketGateway } from './websocket.gateway';
-import { CampaignStatusService } from './campaign-status.service';
 
 @Injectable()
 export class CampaignService {
@@ -174,16 +175,49 @@ export class CampaignService {
         subject: campaign.subject,
         html: campaign.content,
         campaignId,
+        campaign,
       });
 
       // Update campaign status to IN_PROGRESS
-      await this.campaignStatusService.updateStatus(
-        campaignId,
-        CampaignStatus.IN_PROGRESS,
-      );
+      await this.campaignStatusService.updateCampaign(campaignId, {
+        status: CampaignStatus.IN_PROGRESS,
+        sentCount: campaign.sentCount + campaign.recipients?.length || 0,
+      });
 
       return { message: 'Campaign emails queued successfully' };
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAnalyticsOverview(userId: string): Promise<AnalyticsOverview> {
+    try {
+      // Get all campaigns for the user
+      const campaigns = await this.campaignModel.find({ createdBy: userId });
+
+      return {
+        total_campaigns: campaigns?.length || 0,
+        total_emails_sent:
+          campaigns?.reduce((total, campaign) => {
+            if (campaign.type === CampaignType.EMAIL) {
+              return total + campaign.sentCount || 0;
+            }
+            return total;
+          }, 0) || 0,
+        total_sms_sent:
+          campaigns?.reduce((total, campaign) => {
+            if (campaign.type === CampaignType.SMS) {
+              return total + campaign.sentCount || 0;
+            }
+            return total;
+          }, 0) || 0,
+        total_delivered:
+          campaigns?.reduce((total, campaign) => {
+            return total + campaign.deliveredCount || 0;
+          }, 0) || 0,
+      };
+    } catch (error) {
+      this.logger.error('Error getting analytics overview:', error);
       throw error;
     }
   }

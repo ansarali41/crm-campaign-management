@@ -1,5 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/card';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 import { apiClient } from '@/lib/axios';
 import { useCampaignStore } from '@/store/campaign.store';
@@ -11,7 +12,7 @@ import toast from 'react-hot-toast';
 
 export default function CampaignsPage() {
     const router = useRouter();
-    const { campaigns, loading, metadata, fetchCampaigns, deleteCampaign } = useCampaignStore();
+    const { campaigns, loading, metadata, fetchCampaigns, deleteCampaign, error, analytics, getCampaignAnalytics } = useCampaignStore();
     const [mounted, setMounted] = useState(false);
     const [actionCampaign, setActionCampaign] = useState<string | null>(null);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -21,8 +22,9 @@ export default function CampaignsPage() {
 
     useEffect(() => {
         setMounted(true);
+        getCampaignAnalytics();
         fetchCampaigns(1, 10); // Start with first page
-    }, [fetchCampaigns]);
+    }, [fetchCampaigns, getCampaignAnalytics]);
 
     // Prevent hydration mismatch by not rendering until client-side
     if (!mounted) {
@@ -95,9 +97,38 @@ export default function CampaignsPage() {
             </div>
         );
     }
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div className="flex flex-col h-full">
+            <div className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <Card className="p-6">
+                        <h3 className="text-lg font-semibold mb-2">Total Campaigns</h3>
+                        <p className="text-3xl font-bold">{analytics?.total_campaigns?.toLocaleString()}</p>
+                        <p className="text-sm text-gray-500">Total number of campaigns</p>
+                    </Card>
+
+                    <Card className="p-6">
+                        <h3 className="text-lg font-semibold mb-2">Total Emails</h3>
+                        <p className="text-3xl font-bold">{analytics?.total_emails_sent?.toLocaleString()}</p>
+                        <p className="text-sm text-gray-500">Total emails sent</p>
+                    </Card>
+
+                    <Card className="p-6">
+                        <h3 className="text-lg font-semibold mb-2">Total SMS</h3>
+                        <p className="text-3xl font-bold">{analytics?.total_sms_sent?.toLocaleString()}</p>
+                        <p className="text-sm text-gray-500">Total SMS sent</p>
+                    </Card>
+                    <Card className="p-6">
+                        <h3 className="text-lg font-semibold mb-2">Delivered</h3>
+                        <p className="text-3xl font-bold">{analytics?.total_delivered?.toLocaleString()}</p>
+                        <p className="text-sm text-gray-500">Successfully delivered</p>
+                    </Card>
+                </div>
+            </div>
             <div className="px-4 sm:px-6 lg:px-8 py-8">
                 <div className="sm:flex sm:items-center">
                     <div className="sm:flex-auto">

@@ -1,13 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { EmailConsumerService } from './email-consumer.service';
-
-interface EmailMessage {
-  to: string[];
-  subject: string;
-  html: string;
-  campaignId: string;
-}
+import { EmailMessage } from 'src/util/interfaces';
 
 @Controller()
 export class EmailConsumerController {

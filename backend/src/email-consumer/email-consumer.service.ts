@@ -4,13 +4,7 @@ import * as nodemailer from 'nodemailer';
 import { CampaignStatusService } from 'src/campaign/campaign-status.service';
 import { EMAIL_SERVICE_NAME } from 'src/util/constants';
 import { CampaignStatus } from 'src/util/enums';
-
-interface SendEmailParams {
-  to: string[];
-  subject: string;
-  html: string;
-  campaignId: string;
-}
+import { SendEmailParams } from 'src/util/interfaces';
 
 @Injectable()
 export class EmailConsumerService {
@@ -36,10 +30,16 @@ export class EmailConsumerService {
 
   async sendEmail(params: SendEmailParams): Promise<void> {
     try {
-      const { to, subject, html, campaignId } = params;
+      const { to, subject, html, campaignId, campaign } = params;
 
       // Emit event to RabbitMQ queue
-      this.emailClient.emit('send_email', { to, subject, html, campaignId });
+      this.emailClient.emit('send_email', {
+        to,
+        subject,
+        html,
+        campaignId,
+        campaign,
+      });
 
       this.logger.log(`Email queued for sending to ${to?.length} recipients`);
     } catch (error) {
@@ -49,7 +49,7 @@ export class EmailConsumerService {
   }
 
   async processSendEmailQueue(emailData: SendEmailParams) {
-    const { to, subject, html, campaignId } = emailData;
+    const { to, subject, html, campaignId, campaign } = emailData;
 
     try {
       // Send emails to each recipient
@@ -96,17 +96,18 @@ export class EmailConsumerService {
       await Promise.all(emailPromises);
       this.logger.log('All emails sent successfully');
       // update campaign status
-      await this.campaignStatusService.updateStatus(
-        campaignId,
-        CampaignStatus.COMPLETED,
-      );
+      // update campaign sent count
+      await this.campaignStatusService.updateCampaign(campaignId, {
+        status: CampaignStatus.COMPLETED,
+        deliveredCount: campaign?.deliveredCount + to?.length || 0,
+      });
     } catch (error) {
       this.logger.error(`Failed to send email: ${error?.message}`);
       // update campaign status to failed
-      await this.campaignStatusService.updateStatus(
-        campaignId,
-        CampaignStatus.FAILED,
-      );
+      await this.campaignStatusService.updateCampaign(campaignId, {
+        status: CampaignStatus.FAILED,
+        failedCount: campaign?.failedCount + to?.length || 0,
+      });
       throw error;
     }
   }
