@@ -63,7 +63,6 @@ export default function CampaignsPage() {
     const handleRunConfirm = async () => {
         if (campaignToRun) {
             try {
-                // TODO: Add API call to run campaign
                 await apiClient.post(`/campaigns/${campaignToRun}/send`);
                 toast.success('Campaign started successfully');
                 fetchCampaigns(metadata.page, metadata.limit); // Refresh the list
@@ -190,6 +189,22 @@ export default function CampaignsPage() {
                                                         <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-10">
                                                             <div className="py-1">
                                                                 <button
+                                                                    onClick={() => handleRunClick(campaign._id)}
+                                                                    className="group flex items-center w-full px-4 py-2 text-sm text-green-600 hover:bg-gray-100"
+                                                                >
+                                                                    <svg
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        className="h-4 w-4 mr-3 text-green-400 group-hover:text-green-500"
+                                                                        viewBox="0 0 20 20"
+                                                                        fill="currentColor"
+                                                                    >
+                                                                        <path d="M5 4a2 2 0 00-2 2v6a2 2 0 110 4v-6a2 2 0 012-2zM8 4a2 2 0 00-2 2v6a2 2 0 120 4v-6a2 2 0 012-2zM12 4a2 2 0 00-2 2v6a2 2 0 100 4v-6a2 2 0 012-2z" />
+                                                                    </svg>
+                                                                    Run Campaign
+                                                                </button>
+                                                            </div>
+                                                            <div className="py-1">
+                                                                <button
                                                                     onClick={() => {
                                                                         setActionCampaign(null);
                                                                         router.push(`/dashboard/campaigns/${campaign._id}/view`);
@@ -231,22 +246,7 @@ export default function CampaignsPage() {
                                                                     Edit Campaign
                                                                 </button>
                                                             </div>
-                                                            <div className="py-1">
-                                                                <button
-                                                                    onClick={() => handleRunClick(campaign._id)}
-                                                                    className="group flex items-center w-full px-4 py-2 text-sm text-green-600 hover:bg-gray-100"
-                                                                >
-                                                                    <svg
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        className="h-4 w-4 mr-3 text-green-400 group-hover:text-green-500"
-                                                                        viewBox="0 0 20 20"
-                                                                        fill="currentColor"
-                                                                    >
-                                                                        <path d="M5 4a2 2 0 00-2 2v6a2 2 0 110 4v-6a2 2 0 012-2zM8 4a2 2 0 00-2 2v6a2 2 0 120 4v-6a2 2 0 012-2zM12 4a2 2 0 00-2 2v6a2 2 0 100 4v-6a2 2 0 012-2z" />
-                                                                    </svg>
-                                                                    Run Campaign
-                                                                </button>
-                                                            </div>
+
                                                             <div className="py-1">
                                                                 <button
                                                                     onClick={() => handleDeleteClick(campaign._id)}

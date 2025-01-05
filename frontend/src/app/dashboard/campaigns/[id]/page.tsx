@@ -1,10 +1,11 @@
 'use client';
 import Button from '@/components/ui/Button';
 import InputField from '@/components/ui/InputField';
+import HtmlEditor from '@/components/ui/HtmlEditor';
 import { useCampaignStore } from '@/store/campaign.store';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
 interface CampaignForm {
@@ -26,6 +27,7 @@ export default function CampaignFormPage() {
         register,
         handleSubmit,
         reset,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<CampaignForm>({
         defaultValues: campaign
@@ -108,13 +110,11 @@ export default function CampaignFormPage() {
                                     ]}
                                 />
 
-                                <InputField
-                                    label="Content"
-                                    type="textarea"
-                                    placeholder="Enter campaign content"
-                                    {...register('content', { required: 'Content is required' })}
-                                    error={errors.content?.message}
-                                    rows={4}
+                                <Controller
+                                    name="content"
+                                    control={control}
+                                    rules={{ required: 'Content is required' }}
+                                    render={({ field }) => <HtmlEditor label="Content" value={field.value} onChange={field.onChange} error={errors.content?.message} />}
                                 />
 
                                 <InputField

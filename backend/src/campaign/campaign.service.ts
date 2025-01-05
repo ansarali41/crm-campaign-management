@@ -27,11 +27,11 @@ export class CampaignService {
       });
       const savedCampaign = await campaign.save();
 
-      if (savedCampaign.scheduledAt) {
-        this.scheduleCampaign(savedCampaign);
-      }
+      // if (savedCampaign.scheduledAt) {
+      //   this.scheduleCampaign(savedCampaign);
+      // }
 
-      this.wsGateway.notifyNewCampaign(savedCampaign);
+      // this.wsGateway.notifyNewCampaign(savedCampaign);
       return savedCampaign;
     } catch (error) {
       throw error;
